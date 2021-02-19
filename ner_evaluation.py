@@ -7,7 +7,7 @@ from: https://github.com/TeMU-BSC/cantemist-evaluation-library
 """
 
 import pandas as pd
-import ann_parsing
+from prepare_for_NER import ann_parsing
 import warnings
 import os
 
