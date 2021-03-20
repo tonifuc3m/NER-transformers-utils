@@ -140,7 +140,9 @@ def parse_one_ann(info, root, filename, relevant_labels, ignore_related=False,
         
         if mark in mark2code.keys():
             code = mark2code[mark]
-            info.append([filename, mark, label, offset, span, code])
+        else: 
+            code = '-'
+        info.append([filename, mark, label, offset, span, code])
             
     return info
 
