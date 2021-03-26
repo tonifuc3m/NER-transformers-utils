@@ -185,7 +185,8 @@ def conll_to_brat(conll_input_filepath, conll_output_filepath, brat_original_fol
         generate_reference_text_file_for_conll(conll_input_filepath, conll_output_filepath, brat_original_folder)
 
     ################ ANTONIO: Initialize output TSV file ################
-    tsv_output_path = os.path.join(brat_output_folder, 'annots.tsv')
+    brat_parent_dir = os.path.abspath(os.path.join(brat_output_folder, os.pardir))
+    tsv_output_path = os.path.join(brat_parent_dir, 'annots.tsv')
     with codecs.open(tsv_output_path, 'w') as tsv_file:
         tsv_file.write('doc_id\tbegin\tend\ttype\textraction\n')
     ################ ################

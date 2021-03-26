@@ -19,7 +19,44 @@ def argparser():
     args = parser.parse_args()
     return args.predictions_path, args.input_path, args.out_path
 
-def robertaformat_to_conll(roberta_predictions_path, roberta_input_path, out_path):
+def conll_to_robertainput(conll_filepath, outpath):
+    infile = codecs.open(conll_filepath, 'r', 'utf-8')
+    with codecs.open(outpath, 'w', 'utf-8') as outfile:
+        for line in infile:
+            # New sentence
+            if len(line) == 0 or line=='\n' or '-DOCSTART-' in line[0]:
+                outfile.write(line)
+                continue
+            
+            line_sp = line.split(' ')
+            span = line_sp[0]
+            filename = line_sp[1]
+            begin = line_sp[2]
+            end = line_sp[3]
+            tag = line_sp[-1].strip('\n')
+            
+            outfile.write(f"{span}\t{filename}\t{begin}_{end}\t{tag}\n")
+            
+    
+def robertainput_to_conll(roberta_input_filepath, outpath):
+    infile = codecs.open(roberta_input_filepath, 'r', 'utf-8')
+    with codecs.open(outpath, 'w', 'utf-8') as outfile:
+        for line in infile:
+            # New sentence
+            if len(line) == 0 or line=='\n' or '-DOCSTART-' in line[0]:
+                outfile.write(line)
+                continue
+            
+            line_sp = line.split('\t')
+            span = line_sp[0]
+            filename = line_sp[1]
+            [begin,end] = line_sp[2].split('_')
+            tag = line_sp[-1].strip('\n')
+            
+            outfile.write(f"{span} {filename} {begin} {end} {tag}\n")
+            
+            
+def robertaoutput_to_conll(roberta_predictions_path, roberta_input_path, out_path):
     roberta_file = codecs.open(roberta_predictions_path, 'r', 'UTF-8')
     input_file = codecs.open(roberta_input_path, 'r', 'UTF-8')
 
@@ -67,4 +104,4 @@ def robertaformat_to_conll(roberta_predictions_path, roberta_input_path, out_pat
     fout.close()
 if __name__ == '__main__':
     roberta_predictions_path, roberta_input_path, out_path = argparser()
-    robertaformat_to_conll(roberta_predictions_path, roberta_input_path, out_path)
+    robertaoutput_to_conll(roberta_predictions_path, roberta_input_path, out_path)
