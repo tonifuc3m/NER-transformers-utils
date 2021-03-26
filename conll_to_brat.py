@@ -117,7 +117,28 @@ def check_compatibility_between_conll_and_brat_text(conll_filepath, brat_folder)
     
     print("Done.")
 
-def output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, overwrite=False):
+# def output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, overwrite=False):
+#     if previous_filename == '':
+#         return
+#     output_filepath = os.path.join(brat_output_folder, '{0}.ann'.format(previous_filename))
+#     if not overwrite:
+#         # Avoid overriding existing annotation
+#         if os.path.exists(output_filepath) and os.path.getsize(output_filepath) > 0:
+#             raise AssertionError("The annotation already exists at: {0}".format(output_filepath))
+#     # Write the entities to the annotation file
+#     with codecs.open(output_filepath, 'w', 'utf-8') as output_file:
+#         for i, entity in enumerate(entities):
+#             output_file.write('T{0}\t{1} {2} {3}\t{4}\n'.format(i+1, entity['label'], entity['start'], entity['end'], 
+#                                                             replace_unicode_whitespaces_with_ascii_whitespace(text[entity['start']:entity['end']])))
+#     # Copy the corresponding text file
+#     if text_filepath != os.path.join(brat_output_folder, os.path.basename(text_filepath)):
+#         shutil.copy(text_filepath, brat_output_folder)
+        
+def output_entities(brat_output_folder, previous_filename, entities, text_filepath,
+                    text, tsv_output_path, overwrite=False):
+    '''
+    ANTONIO: function modification to output a TSV file with all annotations as well
+    '''
     if previous_filename == '':
         return
     output_filepath = os.path.join(brat_output_folder, '{0}.ann'.format(previous_filename))
@@ -129,7 +150,13 @@ def output_entities(brat_output_folder, previous_filename, entities, text_filepa
     with codecs.open(output_filepath, 'w', 'utf-8') as output_file:
         for i, entity in enumerate(entities):
             output_file.write('T{0}\t{1} {2} {3}\t{4}\n'.format(i+1, entity['label'], entity['start'], entity['end'], 
-                                                           replace_unicode_whitespaces_with_ascii_whitespace(text[entity['start']:entity['end']])))
+                                                            replace_unicode_whitespaces_with_ascii_whitespace(text[entity['start']:entity['end']])))
+    with codecs.open(tsv_output_path, 'a', 'utf-8') as tsv_file:
+        for i, entity in enumerate(entities):
+            tsv_file.write('{0}\t{1}\t{2}\t{3}\t{4}\n'.\
+                           format(previous_filename, entity['start'], entity['end'],
+                                  entity['label'], replace_unicode_whitespaces_with_ascii_whitespace(text[entity['start']:entity['end']])))
+            
     # Copy the corresponding text file
     if text_filepath != os.path.join(brat_output_folder, os.path.basename(text_filepath)):
         shutil.copy(text_filepath, brat_output_folder)
@@ -157,6 +184,12 @@ def conll_to_brat(conll_input_filepath, conll_output_filepath, brat_original_fol
         assert(conll_input_filepath != conll_output_filepath)
         generate_reference_text_file_for_conll(conll_input_filepath, conll_output_filepath, brat_original_folder)
 
+    ################ ANTONIO: Initialize output TSV file ################
+    tsv_output_path = os.path.join(brat_output_folder, 'annots.tsv')
+    with codecs.open(tsv_output_path, 'w') as tsv_file:
+        tsv_file.write('doc_id\tbegin\tend\ttype\textraction\n')
+    ################ ################
+    
     create_folder_if_not_exists(brat_output_folder)
     conll_file = codecs.open(conll_output_filepath, 'r', 'UTF-8')
 
@@ -183,7 +216,8 @@ def conll_to_brat(conll_input_filepath, conll_output_filepath, brat_original_fol
         filename = str(line[1])
         # New file
         if filename != previous_filename:    
-            output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, overwrite=overwrite)
+            #output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, overwrite=overwrite)
+            output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, tsv_output_path, overwrite=overwrite)
             text_filepath = os.path.join(brat_original_folder, '{0}.txt'.format(filename))
             with codecs.open(text_filepath, 'r', 'UTF-8') as f:
                 text = f.read()
@@ -251,7 +285,8 @@ def conll_to_brat(conll_input_filepath, conll_output_filepath, brat_original_fol
                 # Start new entity
                 entity = token
         previous_token_label = token['label']
-    output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, overwrite=overwrite)
+    #output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, overwrite=overwrite)
+    output_entities(brat_output_folder, previous_filename, entities, text_filepath, text, tsv_output_path, overwrite=overwrite)
     conll_file.close()
     print('Done.')
 
