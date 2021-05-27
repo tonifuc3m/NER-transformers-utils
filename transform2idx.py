@@ -24,7 +24,7 @@ def word2int(words, word2idx):
     return idx
 
 
-def get_char_idx(dataset, char2idx, MAXLENCHAR=10):
+def get_char_idx(dataset, char2idx, MAXLENGTH=80, MAXLENCHAR=10):
   X_char = []
   for sentence in dataset['tokens']:
       sent_seq = []
@@ -43,8 +43,8 @@ def get_char_idx(dataset, char2idx, MAXLENCHAR=10):
   return np.asarray(X_char, dtype=np.int64)
 
 
-def label2vec(label,cls=4):
-    vec = np.zeros((label.shape[0],label.shape[1],cls))
+def label2vec(label,classes=4):
+    vec = np.zeros((label.shape[0],label.shape[1],classes))
     for i in range(label.shape[0]):
         for j in range(label.shape[1]):
             t = int(label[i,j])

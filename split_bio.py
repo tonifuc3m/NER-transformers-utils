@@ -38,11 +38,11 @@ def split_bio(datapath):
   for sentence, i in zip(_file_, range(len(_file_))):
     if sentence != '\n':
       splitted = sentence.split(' ')
-      tokens_this_sentence.append(splitted[0])
-      files_this_sentence.append(splitted[1])
-      pos0_this_sentence.append(splitted[2])
-      pos1_this_sentence.append(splitted[3])
-      tags_this_sentence.append(splitted[4].rstrip('\n'))
+      tokens_this_sentence.append(' '.join(splitted[:-4]))
+      files_this_sentence.append(splitted[-4])
+      pos0_this_sentence.append(splitted[-3])
+      pos1_this_sentence.append(splitted[-2])
+      tags_this_sentence.append(splitted[-1].rstrip('\n'))
     else: 
       # End of sentence
       # Check past sentence is correct

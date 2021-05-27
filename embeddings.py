@@ -14,8 +14,15 @@ def add_bpe_emb(dataset, bpe_object, MAXLENGTH, BPEDIM):
   for sentence in dataset['tokens']:
     dataset_bpe_this = []
     for token, idx in zip(sentence, range(len(sentence))):
-      dataset_bpe_this.append(bpemb_es.embed(token))
-    dataset_bpe_this_max = list(map(lambda x: np.max(x, axis=0), dataset_bpe_this))
+      dataset_bpe_this.append(bpe_object.embed(token))
+    try:
+      dataset_bpe_this_max = list(map(lambda x: np.max(x, axis=0), dataset_bpe_this))
+    except Exception as e:
+      print(e)
+      print(sentence)
+      print(repr(token))
+      print(dataset_bpe_this)
+      input('HEHE')
     # Add padding
     if len(sentence)<MAXLENGTH:
       for i in range(MAXLENGTH-len(sentence)):
